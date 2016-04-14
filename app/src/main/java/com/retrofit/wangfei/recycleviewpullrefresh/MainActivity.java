@@ -113,17 +113,17 @@ public class MainActivity extends AppCompatActivity {
                         && lastVisibleItem + 1 == adapter.getItemCount()
                         && adapter.isShowFooter()) {
 
-                    if (mNews != null && mNews.size() > 0) {
+                    if (mNews != null && mNews.size() >= 10) {  // 真实开发中要设置mNews.size()大于加载分页显示的个数
                         adapter.loadLayout.setVisibility(View.VISIBLE);
-                    }
-                    //加载更多
-                    new Handler().postDelayed(new Runnable() {
+                        //加载更多
+                        new Handler().postDelayed(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            netNewsList(false);
-                        }
-                    }, 2000);
+                            @Override
+                            public void run() {
+                                netNewsList(false);
+                            }
+                        }, 2000);
+                    }
                 }
             }
         });
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param isRefresh 是否刷新
      */
-    private void netNewsList(final boolean isRefresh) {
+    private void netNewsList(boolean isRefresh) {
 //        viewDelegate.showLoading();
         if (isRefresh) {
             mPageNum = 1;
@@ -147,14 +147,16 @@ public class MainActivity extends AppCompatActivity {
                 mNews.clear();
             }
         }
+        lists.clear();
         mNews.addAll(initData());
         mAdapter.notifyDataSetChanged();
     }
 
+    private List<String> lists = new ArrayList<>();
     private List<String> initData() {
-        for (int i = 0; i < 5; i++) {
-            mNews.add(i + "");
+        for (int i = 0; i < 10; i++) {
+            lists.add(i + "");
         }
-        return mNews;
+        return lists;
     }
 }
