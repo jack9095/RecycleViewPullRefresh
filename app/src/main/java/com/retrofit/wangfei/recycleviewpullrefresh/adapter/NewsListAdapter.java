@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
  * Date: 2016-04-14
  * Time: 9:57
  * QQ: 929728742
- * Description: 新闻列表适配器
+ * Description: 带上拉加载更多的通用RecyclerView适配器
  */
 public class NewsListAdapter extends RecyclerView.Adapter {
     private static final int TYPE_ITEM = 0x00;//内容
@@ -31,7 +31,7 @@ public class NewsListAdapter extends RecyclerView.Adapter {
     private Activity context;
     private List<String> newsBodies;
 
-    public LinearLayout loadLayout;
+    public LinearLayout loadLayout;   // 显示上拉加载的布局
 
     /**
      * 条目点击监听

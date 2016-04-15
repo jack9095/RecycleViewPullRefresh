@@ -14,6 +14,7 @@ import android.view.View;
 import com.retrofit.wangfei.recycleviewpullrefresh.adapter.NewsListAdapter;
 import com.retrofit.wangfei.recycleviewpullrefresh.util.Constance;
 import com.retrofit.wangfei.recycleviewpullrefresh.view.ProgressLayout;
+import com.rey.material.widget.ProgressView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by Android Studio
- * User: wangfei
+ * User: fei.wang
  * Date: 2016-04-14
  * Time: 9:57
  * QQ: 929728742
@@ -37,11 +38,12 @@ public class MainActivity extends AppCompatActivity {
     SwipeRefreshLayout swipeRefreshLayout;  //下拉刷新控件
     @Bind(R.id.progress_layout)
     ProgressLayout progressLayout;          //进度条布局（通用，可现实错误按钮，点击重试）
+    @Bind(R.id.progress_loading_main)
+    ProgressView progress_loading_main;    // 加载数据是显示的进度圆圈
     private LinearLayoutManager mRecycleViewLayoutManager;
 
     private int mPageNum = 1;
     private NewsListAdapter mAdapter;
-    //新闻数据列表
     private List<String> mNews = new ArrayList<>();
 
     @Override
@@ -53,13 +55,50 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setColorSchemeResources(Constance.colors);//设置下拉刷新控件变换的四个颜色
         mAdapter = new NewsListAdapter(this, mNews);
         recyclerview.setAdapter(mAdapter);
+        recyclerViewOnItemClickListener();
+        refresh();
+        loadMore(mAdapter);
+        progress_loading_main.setVisibility(View.VISIBLE);
+        initData();
+
+    }
+
+    /**进入页面的初始化数据*/
+    private void initData(){
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                netNewsList(true);
+                progress_loading_main.setVisibility(View.GONE);
+            }
+        }, 2000);
+    }
+
+    /**RecyclerView每个item的点击事件*/
+    private void recyclerViewOnItemClickListener() {
         mAdapter.setOnItemClickListener(new NewsListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Snackbar.make(view, "fly", Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
 
+    /**
+     * 初始化RecyclerView
+     */
+    private void initRecyclerView() {
+        //设置分割线
+//        recyclerview.addItemDecoration(new ListItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+        recyclerview.setItemAnimator(new DefaultItemAnimator());
+        recyclerview.setHasFixedSize(true);
+        mRecycleViewLayoutManager = new LinearLayoutManager(this);
+        recyclerview.setLayoutManager(mRecycleViewLayoutManager);  // 设置RecycleView，显示是ListView还是gridView还是瀑布流
+    }
+
+    /**下拉刷新*/
+    private void refresh() {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -73,25 +112,12 @@ public class MainActivity extends AppCompatActivity {
                 }, 2000);
             }
         });
-        loadMore(mAdapter);
     }
 
     /**
-     * 初始化RecyclerView
-     */
-    private void initRecyclerView() {
-        //设置分割线
-//        recyclerview.addItemDecoration(new ListItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-        recyclerview.setItemAnimator(new DefaultItemAnimator());
-        recyclerview.setHasFixedSize(true);
-        mRecycleViewLayoutManager = new LinearLayoutManager(this);
-        recyclerview.setLayoutManager(mRecycleViewLayoutManager);
-    }
-
-    /**
-     * 设置加载更多接口
+     * 设置上拉加载更多
      *
-     * @param adapter 加载更多的回调
+     * @param adapter RecyclerView适配器
      */
     public void loadMore(final NewsListAdapter adapter) {
         recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -132,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 从网络加载数据列表
      *
-     * @param isRefresh 是否刷新
+     * @param isRefresh 是否刷新  true 为刷新，false为不刷新
      */
     private void netNewsList(boolean isRefresh) {
 //        viewDelegate.showLoading();
@@ -147,13 +173,30 @@ public class MainActivity extends AppCompatActivity {
                 mNews.clear();
             }
         }
+
+//        progressLayout.showLoading();  // 网络请求数据的时候，开始加载数据
+//
+//        if (!progressLayout.isContent()) {  // 网络请求数据成功的时候
+//            progressLayout.showContent();
+//        }
+//
+//        if (!progressLayout.isError()) {    // 网络请求数据失败的时候
+//            progressLayout.showError(R.string.load_error, new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Snackbar.make(v, "网络请求数据失败", Snackbar.LENGTH_SHORT).show();
+//                }
+//            });
+//        }
+
+        // TODO 这里把页数mPageNum上传到服务端
         lists.clear();
-        mNews.addAll(initData());
+        mNews.addAll(getData());
         mAdapter.notifyDataSetChanged();
     }
 
     private List<String> lists = new ArrayList<>();
-    private List<String> initData() {
+    private List<String> getData() {
         for (int i = 0; i < 10; i++) {
             lists.add(i + "");
         }

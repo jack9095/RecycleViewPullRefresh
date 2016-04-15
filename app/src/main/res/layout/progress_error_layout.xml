@@ -21,14 +21,16 @@
       android:id="@+id/progress_error_btn"
       android:layout_below="@id/progress_error_tv"
       android:layout_width="80dp"
-      android:layout_height="32dp"
+      android:layout_height="wrap_content"
       android:layout_marginTop="32dp"
       android:layout_centerHorizontal="true"
       android:gravity="center"
       android:textSize="16sp"
       android:text="@string/btn_try_again"
-      android:background="@drawable/selector_item"
-      />
 
+      app:rd_backgroundColor="@color/colorAccent"
+      />
+  <!--切换不同背景，显示不同效果-->
+  <!--android:background="@drawable/selector_item"-->
 
 </RelativeLayout>
